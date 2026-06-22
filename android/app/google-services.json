@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "942257612508",
+    "firebase_url": "https://closh-1500d-default-rtdb.firebaseio.com",
+    "project_id": "closh-1500d",
+    "storage_bucket": "closh-1500d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942257612508:android:a6f033e403a69600aaf619",
+        "android_client_info": {
+          "package_name": "com.closh.delivery1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmDsea-npfAhbVlGCxT5561AU0jlXWaWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942257612508:android:1b9b7b1f90e6b596aaf619",
+        "android_client_info": {
+          "package_name": "com.company.closh1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmDsea-npfAhbVlGCxT5561AU0jlXWaWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
