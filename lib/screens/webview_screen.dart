@@ -1842,6 +1842,7 @@ class _WebViewScreenState extends State<WebViewScreen>
                         await _injectLinkInterceptorScript(controller);
                         await _injectApiInterceptorScript(controller);
                         await _injectBlobInterceptorScript(controller);
+                        await _injectCameraOnlyScript(controller);
                       },
                       onProgressChanged: (controller, progress) {
                         setState(() {
@@ -3115,6 +3116,62 @@ class _WebViewScreenState extends State<WebViewScreen>
           return url;
         };
         console.log('📦 Blob Interceptor Injected');
+      })();
+    """;
+    if (controller != null) {
+      await controller.evaluateJavascript(source: script);
+    }
+  }
+
+  /// Inject script to force camera on file inputs by hijacking clicks
+  Future<void> _injectCameraOnlyScript(InAppWebViewController controller) async {
+    const script = """
+      (function() {
+        if (window._cameraInterceptorInjected) return;
+        window._cameraInterceptorInjected = true;
+        
+        function handleCameraUpload(inputElement) {
+           if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
+              window.flutter_inappwebview.callHandler('openCamera').then(function(result) {
+                if (result && result.success && result.base64) {
+                  var byteString = atob(result.base64);
+                  var ab = new ArrayBuffer(byteString.length);
+                  var ia = new Uint8Array(ab);
+                  for (var i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                  }
+                  var file = new File([ab], result.fileName || 'camera_image.jpg', { type: result.mimeType || 'image/jpeg' });
+                  
+                  var dataTransfer = new DataTransfer();
+                  dataTransfer.items.add(file);
+                  inputElement.files = dataTransfer.files;
+                  
+                  inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+              });
+           }
+        }
+
+        // 1. Intercept native clicks (Capture phase)
+        document.addEventListener('click', function(e) {
+          if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'file') {
+            e.preventDefault();
+            e.stopPropagation();
+            handleCameraUpload(e.target);
+          }
+        }, true);
+
+        // 2. Intercept programmatic clicks
+        var originalClick = HTMLInputElement.prototype.click;
+        HTMLInputElement.prototype.click = function() {
+          if (this.type === 'file') {
+            handleCameraUpload(this);
+            return;
+          }
+          originalClick.call(this);
+        };
+        
+        console.log('📷 Camera Hijack Script Injected');
       })();
     """;
     if (controller != null) {
